@@ -28,7 +28,7 @@ function fixture(file = ':memory:') {
   db.exec(V21)
   db.exec(`UPDATE accounts SET owner_user_id = 'user-a' WHERE id = 1`)
   const r = migrate(db)
-  assert.deepEqual(r.applied, [22])
+  assert.deepEqual(r.applied, [22, 23])
   db.exec(`
     INSERT INTO accounts(id, network, handle, relation, lang, owner_user_id) VALUES (10, 'x', 'acme_brand', 'owned', 'fr', 'user-a');
     INSERT INTO accounts(id, network, handle, relation, lang, owner_user_id) VALUES (20, 'x', 'other_dev', 'owned', 'en', 'user-b');
@@ -67,7 +67,7 @@ test('v22 from a v21 database with data: new tables, defaults, existing rows and
   const db = new DatabaseSync(':memory:')
   db.exec(V21)
   const posts = db.prepare('SELECT * FROM posts ORDER BY id').all()
-  assert.deepEqual(migrate(db), { from: 21, to: 22, applied: [22] })
+  assert.deepEqual(migrate(db), { from: 21, to: 23, applied: [22, 23] })
   for (const t of ['comment_campaigns', 'comment_pains', 'competitor_team', 'comment_candidates']) {
     assert.equal(db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n, 0, t)
   }

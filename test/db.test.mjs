@@ -16,10 +16,10 @@ const version = (db) => Number(db.prepare('PRAGMA user_version').get().user_vers
 test('an empty database receives the shipped schema at version 20 then the shipped migrations, once', () => {
   const db = new DatabaseSync(':memory:')
   const r = migrate(db)
-  assert.deepEqual(r, { from: 0, to: 22, applied: [20, 21, 22] })
+  assert.deepEqual(r, { from: 0, to: 23, applied: [20, 21, 22, 23] })
   assert.ok(db.prepare("SELECT 1 FROM sqlite_master WHERE name = 'studio_requests'").get())
   assert.ok(db.prepare("SELECT 1 FROM sqlite_master WHERE name = 'user_settings'").get())
-  assert.deepEqual(migrate(db), { from: 22, to: 22, applied: [] })
+  assert.deepEqual(migrate(db), { from: 23, to: 23, applied: [] })
   db.close()
 })
 
@@ -54,7 +54,7 @@ test('an old or foreign database is refused, an empty legacy file is never fille
 })
 
 test('the package starts at version 20 and ships its migrations from 021', () => {
-  assert.deepEqual(listMigrations(MIGRATIONS_DIR).map((m) => m.version), [21, 22])
+  assert.deepEqual(listMigrations(MIGRATIONS_DIR).map((m) => m.version), [21, 22, 23])
   assert.match(readFileSync(SCHEMA_FILE, 'utf8'), /PRAGMA user_version = 20;\s*$/)
 })
 

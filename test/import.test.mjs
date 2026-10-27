@@ -62,7 +62,7 @@ test('import copies every row, rewrites media paths, copies media and leaves the
     assert.deepEqual([source, `${source}-wal`].map(sha), hashes, 'the source must not change')
 
     const out = new DatabaseSync(r.target, { readOnly: true })
-    assert.equal(Number(out.prepare('PRAGMA user_version').get().user_version), 22)
+    assert.equal(Number(out.prepare('PRAGMA user_version').get().user_version), 23)
     assert.equal(JSON.parse(out.prepare('SELECT media FROM posts WHERE id = 1').get().media)[0].path, 'media/1.png')
     assert.equal(out.prepare("SELECT value FROM scoped_settings WHERE key = 'rules'").get().value, 'Written after the last checkpoint')
     assert.equal(out.prepare('SELECT mission_id FROM studio_requests').get().mission_id, 'm-1')

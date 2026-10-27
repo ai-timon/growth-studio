@@ -49,7 +49,7 @@ test('a fresh install creates its database in the plugin storage and serves it',
     assert.deepEqual(o.json.accounts, [])
     const d = await call('GET /admin/data')
     assert.equal(d.json.source, 'plugin')
-    assert.equal(d.json.version, 22)
+    assert.equal(d.json.version, 23)
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 

@@ -116,8 +116,8 @@ test('feedback: context, pending, propose (evidence checked), done', () => {
     assert.match(t.run('feedback', 'context', '--account', '1', '--days', '100000'), /Too long, keep one detail/)
     assert.match(t.run('feedback', 'pending'), /1 feedback item\(s\) not synthesized/)
     assert.throws(() => t.run('feedback', 'propose', '--text', 'Keep it short', '--evidence', '99'), /unknown feedback id/)
-    assert.match(t.run('feedback', 'propose', '--text', 'Keep it short', '--evidence', '1', '--account', '1'), /proposal #1 saved/)
-    assert.match(t.run('feedback', 'pending'), /0 feedback item\(s\)[\s\S]*#1 Keep it short/)
+    assert.match(t.run('feedback', 'propose', '--text', 'Keep it short', '--evidence', '1', '--account', '1'), /rule #1 applied automatically \(the user can revoke it in Settings › Learning\)/)
+    assert.match(t.run('feedback', 'pending'), /0 feedback item\(s\)[\s\S]*\[accepted\] Keep it short/)
     assert.match(t.run('feedback', 'done', '1'), /0 feedback item\(s\) marked/)
     assert.throws(() => t.run('feedback', 'propose', '--text', 'x', '--evidence', '1', '--account', '99'), /unknown managed account/)
   } finally { t.done() }

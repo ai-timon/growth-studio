@@ -79,7 +79,7 @@ sources) is set inside the studio instead, per user, organization and account.
 | `tregToken` / `tregTokenSecret` | empty | treg key typed here, or the name of the vault secret holding it (http mode) |
 | `getxapiKey` / `getxapiKeySecret` | empty / `GETXAPI_KEY` | GetXAPI key typed here, or the name of the vault secret holding it |
 | `chromeBinary` | empty | headless browser for coded visuals (name or absolute path); empty = the first allowed of `google-chrome`, `google-chrome-stable`, `chromium`, `chromium-browser`, `chrome`, `msedge` |
-| `rulesToMemory` | off | also record an accepted rule for all accounts in the agent's Timon memory |
+| `rulesToMemory` | off | also record an accepted (or automatically applied) rule for all accounts in the agent's Timon memory |
 | `backupsToKeep` | 5 | database backups kept before each migration |
 | `dataSource` / `legacyDbPath` | `plugin` / empty | transition only: serve an existing project database in place instead of the plugin's own (see "Import an existing database") |
 
@@ -180,8 +180,9 @@ once no other tool does the same work, or the same content is fetched (and paid)
 
 - **Weekly synthesis of the feedback** (`synthesisJob`): once a week (`synthesis_weekday`, 0 = Sunday, default 0;
   `synthesis_hour`, default 19, in the publishing time zone), for each user with feedback not synthesized yet, one
-  mission reads it (`feedback pending`) and proposes rules (`feedback propose`). The user accepts or refuses them in
-  Settings › Learning; neither the job nor the mission installs a rule. Switched on after a slot has passed, it waits
+  mission reads it (`feedback pending`) and proposes rules (`feedback propose`). By default the studio applies a proposed rule at once (user setting
+  `rules_auto_accept`, Settings › Learning); the user can revoke any applied rule there, and a revoked rule is never
+  proposed again. With the setting off, the user accepts or refuses each proposal; the mission itself never installs a rule. Switched on after a slot has passed, it waits
   for the next one.
 
 - **Prospecting comments** (`commentsJob`): for each active comment campaign, when due (`comments_poll_interval_min`,

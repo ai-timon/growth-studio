@@ -3,6 +3,41 @@
 Versions follow [semver](https://semver.org). The schema version of the database (`PRAGMA user_version`) is given
 when it changes; every shipped schema version has its fixture in `test/fixtures/`.
 
+## 0.2.0-rc.19 — 2026-10-27
+
+The studio learns by itself: learned rules apply automatically and can be revoked. Schema version 23.
+
+- New user setting `rules_auto_accept` (default on, Settings › Learning): when `feedback propose` creates a proposal,
+  the rule is applied in the same transaction exactly like a manual acceptance (line added to the rules of its account
+  or of the user, `status = accepted`, `decision_note = auto`). The CLI answers `rule #N applied automatically (the
+  user can revoke it in Settings › Learning)`. With the setting off, the proposal waits as before. `rulesToMemory`
+  keeps working for an automatically applied rule for all accounts. Proposals already waiting at update time stay
+  waiting (no retroactive acceptance).
+- `POST /rules/:id/revoke` (optional note) on an accepted rule: removes its exact line from the rules of its scope
+  (other lines and hand-written rules untouched), status `revoked`. A line edited by hand since is not found: the rule
+  is still marked revoked and the answer says so. Settings › Learning lists the applied rules with a "Revoke" button
+  and an "auto" badge. The logic is shared with the manual acceptance (`lib/rules.js`).
+- A revoked rule is never proposed again: `feedback pending` lists it with the refused ones, and it leaves the shared
+  rules of the feedback context.
+- Migration 023 (contract phase): `rule_proposals.status` accepts `revoked` (the table is rebuilt, rows copied as
+  they are; backup first like every migration). Fixture `db-v23.sql`.
+- Tools skill (version 9), weekly synthesis brief and README describe the automatic acceptance and the revocation.
+
+## 0.2.0-rc.18 — 2026-10-27
+
+Upload your own image on a post. No schema change (22).
+
+- Post sheet: "Add an image…" (file picker or drag and drop) attaches an image from the user's disk, with an optional
+  alt text. PNG, JPEG, WebP or GIF (checked on the bytes, not the name), 5 MB at most, 1 to 4 images per post; each
+  image can be removed with its ×, and a new one replaces or completes the existing ones. Not available once a post is
+  published or rejected.
+- Host routes `POST posts/:id/media` (base64 `data`, `alt`, `mode` replace|add) and `POST posts/:id/media/remove`.
+  They share `storeMedia` with the agent's `attach-media` (same `media/<id>.<ext>` storage, same `posts.media` update,
+  same thumbnail refresh), which now accepts any of the four formats through that code. A validated post without a
+  slot that receives an image is scheduled at once (next free slot); removing the only image of a scheduled post puts
+  it back to validated without a slot. `no_media` is never touched and the guard triggers are unchanged.
+- The media route serves WebP and GIF.
+
 ## 0.2.0-rc.17 — 2026-10-27
 
 Calendar drag and drop and open source preparation. No schema change (22).

@@ -93,6 +93,8 @@ test('two users: each one only sees their own organizations, accounts, posts and
       ['POST /posts/:id/approve', { params: { id: '1' }, body: {} }, 'post not found'],
       ['POST /posts/:id/reject', { params: { id: '1' }, body: { note: 'no' } }, 'post not found'],
       ['POST /posts/:id/publish', { params: { id: '2' } }, 'post not found'],
+      ['POST /posts/:id/media', { params: { id: '1' }, body: { data: 'AAAA' } }, 'post not found'],
+      ['POST /posts/:id/media/remove', { params: { id: '1' }, body: { index: 0 } }, 'post not found'],
       ['GET /media/:id', { params: { id: '1' } }, 'media not found'],
       ['POST /ideas/:id/drop', { params: { id: '1' }, body: {} }, 'idea not found'],
       ['POST /items/:id/verdict', { params: { id: '2' }, body: { verdict: 'ignore' } }, 'item not found'],
