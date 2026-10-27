@@ -1,0 +1,195 @@
+{
+  "name": "@timon-ai/growth-studio",
+  "version": "0.2.0-rc.17",
+  "description": "Timon plugin: write, validate, schedule and publish social posts with an agent of your choice.",
+  "author": {
+    "name": "Timon",
+    "url": "https://timon-ai.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-timon/growth-studio.git"
+  },
+  "homepage": "https://github.com/ai-timon/growth-studio#readme",
+  "bugs": {
+    "url": "https://github.com/ai-timon/growth-studio/issues"
+  },
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    "./client": "./lib/client.js"
+  },
+  "files": [
+    "lib/",
+    "bin/",
+    "db/",
+    "icon.svg",
+    "screenshots/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "test": "timeout 300 node --max-old-space-size=512 --test --test-timeout=30000 --test-concurrency=1 'test/**/*.test.mjs'"
+  },
+  "timon": {
+    "id": "growth-studio",
+    "apiVersion": 10,
+    "kind": [
+      "island",
+      "page",
+      "widget"
+    ],
+    "label": "Growth Studio",
+    "description": "Growth Studio: queue of drafts, validation, automatic scheduling, calendar, triage of watched content and publishing at the planned time, with an agent of your choice.",
+    "author": "Timon",
+    "icon": "icon.svg",
+    "cover": "screenshots/posts.png",
+    "screenshots": [
+      "screenshots/posts.png",
+      "screenshots/post.png",
+      "screenshots/calendar.png",
+      "screenshots/feed.png",
+      "screenshots/settings.png"
+    ],
+    "route": "/growth",
+    "permissions": [
+      "settings",
+      "storage",
+      "notify",
+      "secrets:read",
+      "http:outbound",
+      "host:exec",
+      "missions:spawn",
+      "realtime:publish",
+      "skills:write",
+      "agents:manage",
+      "backends:read"
+    ],
+    "client": {
+      "slots": [
+        "nav.item",
+        "island.content",
+        "page",
+        "cockpit.widget"
+      ],
+      "external": [
+        "react",
+        "@timon/ui"
+      ],
+      "mode": "esm"
+    },
+    "settings": [
+      {
+        "key": "dataSource",
+        "type": "string",
+        "label": "Data source: plugin (the plugin's own database) or legacy (an existing project database, during the transition)",
+        "default": "plugin"
+      },
+      {
+        "key": "legacyDbPath",
+        "type": "string",
+        "label": "Legacy mode only: absolute path of the project's growth.db (empty = the project this package was installed from)",
+        "default": ""
+      },
+      {
+        "key": "backupsToKeep",
+        "type": "number",
+        "label": "Database backups to keep: before each update of its database the plugin saves a copy (growth.db.bak-v<version>-<date> in its storage folder) and keeps this many",
+        "default": 5
+      },
+      {
+        "key": "agent",
+        "type": "string",
+        "label": "Agent: the Timon agent that writes for the studio (drafts, rewrites, visuals, ideas). Required: the studio starts no mission until it is set",
+        "default": ""
+      },
+      {
+        "key": "agentNode",
+        "type": "string",
+        "label": "Command the agent runs the studio tools with (Node.js 22.5 or newer): empty = the runtime running Timon; set it (e.g. node, or an absolute path) when the agent check of the Set up cannot reach the studio",
+        "default": ""
+      },
+      {
+        "key": "bookmarksJob",
+        "type": "boolean",
+        "label": "Fetch X bookmarks in the studio (job): first page every few minutes, then one triage mission at a time. Leave off while another tool still fetches them",
+        "default": false
+      },
+      {
+        "key": "watchJob",
+        "type": "boolean",
+        "label": "Watch followed accounts in the studio (job): polls due accounts through treg, detects news of breaking accounts and starts the news drafts. Leave off while another tool still polls them",
+        "default": false
+      },
+      {
+        "key": "synthesisJob",
+        "type": "boolean",
+        "label": "Weekly synthesis of the feedback in the studio (job): once a week, one mission turns the user's recurring feedback into rule proposals to accept or refuse in Settings › Learning. Leave off while another tool still runs it",
+        "default": false
+      },
+      {
+        "key": "commentsJob",
+        "type": "boolean",
+        "label": "Search posts for the prospecting comment campaigns in the studio (job): searches the queries of the active campaigns through treg, sets aside the authors affiliated with a competitor, then one qualification mission at a time. Leave off while another tool still searches them",
+        "default": false
+      },
+      {
+        "key": "tregMode",
+        "type": "string",
+        "label": "treg connector: cli (the treg command with the `treg login` session of the user running Timon) or http (treg API with a key, see below)",
+        "default": "cli"
+      },
+      {
+        "key": "tregBaseUrl",
+        "type": "string",
+        "label": "treg http mode: API address (its host must be in pluginPolicy.http.allow)",
+        "default": "https://treg.to"
+      },
+      {
+        "key": "tregToken",
+        "type": "secret",
+        "label": "treg http mode: API key typed here (wins over the vault secret below)",
+        "default": ""
+      },
+      {
+        "key": "tregTokenSecret",
+        "type": "string",
+        "label": "treg http mode: name of the vault secret holding the treg API key, granted to agent:plugin:growth-studio",
+        "default": ""
+      },
+      {
+        "key": "getxapiKey",
+        "type": "secret",
+        "label": "GetXAPI key typed here (bookmarks, media upload, quotes; wins over the vault secret below)",
+        "default": ""
+      },
+      {
+        "key": "getxapiKeySecret",
+        "type": "string",
+        "label": "Name of the vault secret holding the GetXAPI key, granted to agent:plugin:growth-studio (the x.com cookie of each account is set in the account's Publishing tab)",
+        "default": "GETXAPI_KEY"
+      },
+      {
+        "key": "chromeBinary",
+        "type": "string",
+        "label": "Headless browser that renders coded visuals (name or absolute path, allowed in pluginPolicy.exec.allow); empty = google-chrome, chromium… whichever is allowed. Without one, the agent renders the page itself",
+        "default": ""
+      },
+      {
+        "key": "rulesToMemory",
+        "type": "boolean",
+        "label": "When a rule for all accounts is accepted, also have the agent record it in its Timon memory",
+        "default": false
+      }
+    ],
+    "license": {
+      "required": false
+    }
+  }
+}

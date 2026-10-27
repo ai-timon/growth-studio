@@ -1,0 +1,8 @@
+node_modules/
+*.tgz
+# render bench (development tool, outside the package): screenshots, exported data and local copies (regenerable)
+tools/render-bench/out/
+tools/render-bench/fx/
+tools/render-bench/api/
+tools/render-bench/react*.js
+tools/render-bench/testroot/

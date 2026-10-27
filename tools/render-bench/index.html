@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script src="react.production.min.js"></script><script src="react-dom.production.min.js"></script>
+<script type="importmap">{"imports":{"react":"./react.js","@timon/ui":"./ui.js"}}</script>
+<style>
+:root.light{--surface-0:220 14% 97%;--surface-1:0 0% 100%;--surface-2:220 12% 94%;--surface-3:0 0% 100%;--surface-4:220 11% 91%;
+--shadow-1:0 1px 2px hsl(40 10% 20% / .08);--shadow-2:0 6px 18px -6px hsl(40 10% 20% / .14),0 2px 6px -2px hsl(40 10% 20% / .08);
+--background:var(--surface-0);--foreground:0 0% 9%;--card:var(--surface-1);--card-foreground:0 0% 9%;--popover:var(--surface-3);--popover-foreground:0 0% 9%;
+--primary:174 72% 27%;--primary-foreground:0 0% 100%;--secondary:var(--surface-4);--muted:var(--surface-2);--muted-foreground:220 8% 40%;
+--accent:var(--primary);--accent-foreground:0 0% 100%;--destructive:4 62% 45%;--destructive-foreground:0 0% 100%;--border:180 9% 82%;--input:var(--border);--ring:var(--primary);--radius:8px;
+--success:144 50% 36%;--warning:39 100% 32%;--info:212 60% 41%}
+:root.dark{--surface-0:220 10% 9%;--surface-1:220 9% 12%;--surface-2:220 8% 15%;--surface-3:220 8% 14%;--surface-4:220 8% 18%;
+--shadow-1:0 1px 2px rgba(0,0,0,.4);--shadow-2:0 6px 18px -6px rgba(0,0,0,.5);
+--background:var(--surface-0);--foreground:0 0% 92%;--card:var(--surface-1);--card-foreground:0 0% 92%;--popover:var(--surface-3);--popover-foreground:0 0% 92%;
+--primary:173 51% 58%;--primary-foreground:0 0% 8%;--secondary:var(--surface-4);--muted:var(--surface-2);--muted-foreground:220 8% 70%;
+--accent:var(--primary);--accent-foreground:0 0% 8%;--destructive:0 64% 68%;--destructive-foreground:0 0% 8%;--border:180 8% 24%;--input:var(--border);--ring:var(--primary);--radius:8px;
+--success:144 45% 55%;--warning:39 90% 60%;--info:212 70% 65%}
+html,body{margin:0;height:100%;background:hsl(var(--background));color:hsl(var(--foreground));font-family:Inter,"Segoe UI",system-ui,sans-serif}
+#root{height:100%}
+</style></head><body><div id="root"></div>
+<script type="module">
+const q = new URLSearchParams(location.search)
+document.documentElement.className = q.get('theme') || 'light'
+window.__menuOpen = q.has('menu')
+const fx = (p) => 'fx/' + p.replace(/[^a-z0-9]/g, '_') + '.json'
+const mod = await import('../../lib/client.js?' + Date.now())
+let Page
+const ctx = { id: 'growth-studio', realtime: null,
+  // `?live`: the routes of a real host half (demo-shots.mjs) instead of the exported fixtures
+  api: async (p, init) => { if (q.has('live')) return fetch('/api/ui/plugins/growth-studio/' + p, init); if (p.startsWith('i18n/') && window.__i18n) return new Response(JSON.stringify(window.__i18n)); const r = await fetch(fx(p)); return r.ok ? r : new Response(JSON.stringify({ posts: [] }), { status: 200 }) },
+  slots: { register: (o, C) => { if (o.slot === 'page') Page = C; return () => {} } } }
+mod.apply(ctx)
+// ouvrir directement une vue : props de départ du composant Studio (rien de global dans le paquet livré)
+// a language other than English: its messages are served from the plugin's i18n folder
+// (rendered through the page slot, whose LocaleGate loads them like in Timon: `?page&lang=fr`)
+if (q.get('lang') && q.get('lang') !== 'en') { const r = await fetch('../../lib/i18n/' + q.get('lang') + '.json'); if (r.ok) window.__i18n = await r.json() }
+const props = { ctx, initialView: q.get('view') || 'queue', initialSetupStep: q.get('step') || null, initialPost: Number(q.get('id')) || null,
+  initialSettings: q.get('scope') ? { scope: q.get('scope'), id: Number(q.get('sid')) || 0, tab: q.get('tab') } : null }
+ReactDOM.createRoot(document.getElementById('root')).render(q.has('page') ? React.createElement(Page) : React.createElement('main', { style: { height: '100vh' } }, React.createElement(mod.Studio, props)))
+</script></body></html>
